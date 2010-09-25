@@ -1,7 +1,8 @@
+# -*- coding: utf-8 -*-
 # Downloads the SRTM data for Australia
 
 # Import some libraries:
-from ftplib import FTP
+import httplib
 import urllib
 import re
 import sys
@@ -34,21 +35,23 @@ def main():
         "Argument 3-6 optionally specify a bounding box: north, south, west, east"
         exit()
         
-    # First we get the list of files through an FTP connection.
-    ftp = FTP('e0srp01u.ecs.nasa.gov')
+    # First we get the list of files through an HTTP connection.
+    http = httplib.HTTPConnection('dds.cr.usgs.gov')
 
-    ftp.login()
-
-    ftp.cwd("srtm/version2/SRTM3/" + continent)
+    http.request("GET", "/srtm/version2_1/SRTM3/" + continent + "/");
 
     # Now list all tiles of that continent.
-    # See ftp://e0srp01u.ecs.nasa.gov/srtm/version2/SRTM3/[continent]/
+    # See http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/[continent]/
     
-    files = ftp.nlst()
+    response = http.getresponse()
+    html = response.read()
+
+    files = re.findall(r'<a href="([^"]+)"', html)
+    files.pop(0) #remove "Parent Directory" link
     
     # And close connection.
     
-    ftp.close()
+    http.close()
 
     # Now download all files using urllib.urlretrieve
     
@@ -74,7 +77,7 @@ def main():
           [lat,lon] = util.getLatLonFromFileName(files[i])
           if util.inBoundingBox(lat, lon, north, south, west, east):
             print "Downloading " + files[i] + " (lat = " + str(lat)  + " , lon = " + str(lon) + " )... (" + str(i + 1) + " of " + str(len(files)) +")"
-            urllib.urlretrieve("ftp://e0srp01u.ecs.nasa.gov/srtm/version2/SRTM3/" + continent + "/"  + files[i],"data/" + continent + "/" + files[i])
+            urllib.urlretrieve("http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/" + continent + "/"  + files[i],"data/" + continent + "/" + files[i])
             
 if __name__ == '__main__':            
     main()
