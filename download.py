@@ -5,7 +5,10 @@
 import httplib
 import urllib
 import re
+import os
+import shutil
 import sys
+import tempfile
 
 from data import util
 
@@ -30,9 +33,7 @@ def main():
     else:
         print "Please provide arguments \n",\
         "First argument should be Africa, Australia, Eurasia, Islands, North_America or South_America.\n",\
-        "Second argument (optional) specifies from which tile to resume. Use full file name e.g. \n",\
-        "'N36W004.hgt.zip'. Set to 0 start at the first file. \n",\
-        "Argument 3-6 optionally specify a bounding box: north, south, west, east"
+        "Argument 2-5 optionally specify a bounding box: north, south, west, east"
         exit()
         
     # First we get the list of files through an HTTP connection.
@@ -55,29 +56,20 @@ def main():
 
     # Now download all files using urllib.urlretrieve
     
-    # Determine if we need to resume at a certain point
-    if(len(sys.argv) > 2):
-        resume = sys.argv[2]
-        if not(resume == "0"):
-            skip = True     
-            print "Resume from " + resume + "..."
-        else:
-            skip = False
-    else: 
-        skip = False
-
     # Do we have a bounding box?
-    [north, south, west, east] = util.getBoundingBox(sys.argv, 3)
+    [north, south, west, east] = util.getBoundingBox(sys.argv, 2)
     for i in range(len(files)):
-      if skip:
-          if files[i] == resume:
-              skip = False
-          
-      if not(skip):
+      if not (os.path.exists("data/" + continent + "/" + files[i])):
           [lat,lon] = util.getLatLonFromFileName(files[i])
           if util.inBoundingBox(lat, lon, north, south, west, east):
             print "Downloading " + files[i] + " (lat = " + str(lat)  + " , lon = " + str(lon) + " )... (" + str(i + 1) + " of " + str(len(files)) +")"
-            urllib.urlretrieve("http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/" + continent + "/"  + files[i],"data/" + continent + "/" + files[i])
+            (f, tmp) = tempfile.mkstemp()
+            try:
+                urllib.urlretrieve("http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/" + continent + "/"  + files[i], tmp)
+                os.close(f)
+                shutil.move(tmp, "data/" + continent + "/" + files[i])
+            except:
+                os.remove(tmp)
             
 if __name__ == '__main__':            
     main()
