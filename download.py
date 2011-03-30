@@ -16,6 +16,10 @@ def handleDownload(block):
     file.write(block)
     print ".",
 
+def usage():
+    print "First argument should be Africa, Australia, Eurasia, Islands, North_America or South_America.\n",\
+        "Argument 2-5 optionally specify a bounding box: north, south, west, east"
+
 def main():
     # First we make a list of all files that need to be download. This depends
     # on the arguments given to the program.
@@ -27,14 +31,13 @@ def main():
     # * North_America  
     # * South_America    
 
-    if len(sys.argv) > 1:
+    try:
         continent = sys.argv[1]
-        util.verifyIsContinent(continent)
-    else:
-        print "Please provide arguments \n",\
-        "First argument should be Africa, Australia, Eurasia, Islands, North_America or South_America.\n",\
-        "Argument 2-5 optionally specify a bounding box: north, south, west, east"
-        exit()
+    except:
+        continent = ""
+    if not continent in ["Africa", "Australia", "Eurasia",  "Islands", "North_America", "South_America"]:
+        usage()
+        sys.exit(1)
         
     # First we get the list of files through an HTTP connection.
     http = httplib.HTTPConnection('dds.cr.usgs.gov')

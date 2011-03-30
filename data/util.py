@@ -61,8 +61,3 @@ def getLatLonFromFileName(name):
     lon = -int(lon_str[1:])
 
   return [lat,lon]
-
-def verifyIsContinent(continent):
-  if not continent in ["Africa", "Australia", "Eurasia",  "Islands", "North_America", "South_America"]:
-    print "First argument should be Africa, Australia, Eurasia, Islands, North_America or South_America."
-    exit()
