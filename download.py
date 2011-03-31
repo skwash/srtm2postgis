@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Downloads the SRTM data for Australia
+# Downloads the SRTM data for a given continent
 
 # Import some libraries:
 import httplib
@@ -35,7 +35,7 @@ def main():
         continent = '_'.join(map(lambda s: s.capitalize(), re.split('[ _]', sys.argv[1])))
     except:
         continent = ""
-    if not continent in ["Africa", "Australia", "Eurasia",  "Islands", "North_America", "South_America"]:
+    if not continent in "Africa Australia Eurasia Islands North_America South_America".split():
         usage()
         sys.exit(1)
         

@@ -2,13 +2,7 @@ import files
 import re
 
 def getFilesHashes(continent):
-    if continent == 'Australia': files_hashes = files.Australia
-    if continent == 'Eurasia': files_hashes = files.Eurasia
-    if continent == 'Africa': files_hashes = files.Africa
-    if continent == 'Islands': files_hashes = files.Islands
-    if continent == 'North_America': files_hashes = files.North_America
-    if continent == 'South_America': files_hashes = files.South_America
-    return files_hashes
+    return getattr(files, continent)
   
 def numberOfFiles(file_list, north, south, west, east):
   i = 0 

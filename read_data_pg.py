@@ -107,18 +107,18 @@ class DatabasePsycopg2:
 def main():
   db_psycopg2 = DatabasePsycopg2(database_pg.db, database_pg.db_user, database_pg.db_pass)
 
-  try:
-      continent = '_'.join(map(lambda s: s.capitalize(), re.split('[ _]', sys.argv[1])))
-
-  except: 
-      print "Please specify the continent. Africa, Australia, Eurasia, Islands, North_America or South_America."
-
   # Does the user want to empty the database?
   if 'empty' in sys.argv:
     print "Deleting tables from databse..." 
     db_psycopg2.dropAllTables()
     print "Done..."
     exit()
+
+  try:
+      continent = '_'.join(map(lambda s: s.capitalize(), re.split('[ _]', sys.argv[1])))
+  except: 
+      print "Please specify the continent. Africa, Australia, Eurasia, Islands, North_America or South_America."
+      sys.exit(1)
 
   [north, south, west, east] = util.getBoundingBox(sys.argv, 3)
 
