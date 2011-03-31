@@ -42,10 +42,10 @@ Run script that reads files and puts them in the database.
 Test it first:
 
 $ python test/test_read_data.py
-$ python read_data.py continent
+$ python read_data_pg.py continent
 
 Verify the result
 
-$ python read_data.py continent verify 
+$ python read_data_pg.py continent verify 
 
 All altitude data should now be in the table 'altitude'. Enjoy.
