@@ -71,7 +71,8 @@ def main():
                 urllib.urlretrieve("http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/" + continent + "/"  + files[i], tmp)
                 os.close(f)
                 shutil.move(tmp, "data/" + continent + "/" + files[i])
-            except:
+            except Exception, msg:
+                sys.stderr.write(str(msg) + "\n")
                 os.remove(tmp)
             
 if __name__ == '__main__':            
