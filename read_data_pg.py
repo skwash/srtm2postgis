@@ -96,6 +96,13 @@ class DatabasePsycopg2:
     self.cursor.copy_from(f, 'altitude') 
     f.close() 
 
+  def vacuum(self):
+    self.cursor.connection.commit()
+    old_isolation_level = self.cursor.connection.isolation_level
+    self.cursor.connection.set_isolation_level(0)
+    self.cursor.execute("VACUUM ANALYZE altitude")
+    self.cursor.connection.set_isolation_level(old_isolation_level)
+
   def getTables(self):
     sql = "SELECT c.relname, n.nspname FROM pg_catalog.pg_class c LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace WHERE c.relkind = 'r' AND n.nspname != 'pg_catalog' AND n.nspname != 'information_schema' AND n.nspname !~ '^pg_toast' AND pg_catalog.pg_table_is_visible(c.oid) AND c.relname != 'spatial_ref_sys' AND c.relname != 'geometry_columns'"
     return map(lambda t: t[0], self.query(sql))
@@ -173,8 +180,10 @@ def main():
 
           db_psycopg2.insertTile(tile, lat, lon)
 
-  print("All tiles inserted. Pleasy verify the result with python \
-  read_data.py verify")
+  print("All tiles inserted. Will now finalize operation")
+  db_psycopg2.vacuum()
+
+  print("Import is done.  Pleasy verify the result with python read_data_pg.py verify")
 
 
 if __name__ == '__main__':
