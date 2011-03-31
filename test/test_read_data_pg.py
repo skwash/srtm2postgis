@@ -1,6 +1,5 @@
 import sys
 import os
-import pg
 
 import unittest
 sys.path += [os.path.abspath('.')]
@@ -72,26 +71,24 @@ class TestImportScript(unittest.TestCase):
 
 class TestDatabase(unittest.TestCase):
   def setUp(self):
-    self.db_pg = read_data_pg.DatabasePg(database_pg_test.db, database_pg_test.db_user, database_pg_test.db_pass) 
     # Drop all tables
-    self.db_pg.dropAllTables();
-
     self.db_psycopg2 = read_data_pg.DatabasePsycopg2(database_pg_test.db, database_pg_test.db_user, database_pg_test.db_pass) 
+    self.db_psycopg2.dropAllTables()
 
   def testDatabasePresent(self):
     # Already tested in setUp()
     self.assert_(True)
 
   def testDatabaseEmpty(self):
-    self.assert_(self.db_pg.checkDatabaseEmpty)
+    self.assert_(self.db_psycopg2.checkDatabaseEmpty())
   
   def testTableAltitudeExists(self):
     # Call function to create table
-    self.db_pg.createTableAltitude()
+    self.db_psycopg2.createTableAltitude()
 
-    tables = self.db_pg.getTables()
+    tables = self.db_psycopg2.getTables()
     
-    self.assert_('public.altitude' in tables) 
+    self.assert_('altitude' in tables) 
 
   def testGetLatLonFromFileName(self):
     self.assertEqual([-11,119], getLatLonFromFileName("S11E119"))
@@ -109,7 +106,7 @@ class TestDatabase(unittest.TestCase):
   
   def testInsertTileIntoDatabase(self):
     # Create table
-    self.assert_(self.db_pg.createTableAltitude())
+    self.assert_(self.db_psycopg2.createTableAltitude())
 
     # Load example tile
     fulltile = loadTile('Australia', 'S37E145')
@@ -130,14 +127,14 @@ class TestDatabase(unittest.TestCase):
     self.db_psycopg2.insertTile(tile, lat, lon)
 
     # Check if the tile is indeed in the database
-    tile_back = self.db_pg.readTile(lat, lon)
+    tile_back = self.db_psycopg2.readTile(lat, lon)
     for i in range(len(tile) - 1):
       for j in range(len(tile) - 1):
         self.assert_(tile_back[i][j] == tile[i+1][j])
   
   def testInsertTileWithNull(self):
     # Create table
-    self.assert_(self.db_pg.createTableAltitude())
+    self.assert_(self.db_psycopg2.createTableAltitude())
 
     # Some tiles contain the value -32768, which means NULL (not implemented yet)
     # Tile S27E123 has several -32768 values, for example tile[1086][462]
@@ -156,19 +153,15 @@ class TestDatabase(unittest.TestCase):
     self.db_psycopg2.insertTile(tile, lat, lon)
 
     # Check if the tile is indeed in the database
-    tile_back = self.db_pg.readTile(lat, lon)
+    tile_back = self.db_psycopg2.readTile(lat, lon)
     for i in range(len(tile) - 1):
       for j in range(len(tile) - 1):
         self.assert_(tile_back[i][j] == tile[i+1][j])
 
   def tearDown(self):
     # Drop all tables that might have been created:
-    self.db_pg.dropAllTables;
+    self.db_psycopg2.dropAllTables()
+    self.db_psycopg2 = None
 
 if __name__ == '__main__':
-  # We will only do this for a PostGIS database:
-    
-  if file("POSTGIS"):
     unittest.main()
-  else:
-    print "Only tests for PostGIS database at the moment."

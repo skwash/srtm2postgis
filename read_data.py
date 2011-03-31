@@ -60,8 +60,7 @@ def verify(db, number_of_tiles, files_hashes, continent, north, south, west, eas
     
     print "Check the total number of points in the database..."
     
-    sql = db.query("SELECT count(pos) FROM altitude")
-    total = int(sql.getresult()[0][0])
+    total = db.query("SELECT count(pos) FROM altitude")[0][0]
     if not total == number_of_tiles * 1200 * 1200:
       print "Not all tiles have been (completely) inserted!"
       exit()
