@@ -44,6 +44,7 @@ def inBoundingBox(lat,lon, north, south, west, east):
   return (lat <= north and lat >= south and lon >= west and lon <= east)
 
 def getLatLonFromFileName(name):
+  name = name.upper()
   # Split up in lat and lon:
   p = re.compile('[NSEW]\d*')
   [lat_str, lon_str] = p.findall(name)
