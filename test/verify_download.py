@@ -14,11 +14,12 @@
 import hashlib
 import sys
 import os
+import re
 
 sys.path += [os.path.abspath('.')]
 from data import util, files
 
-continent = sys.argv[1]
+continent = '_'.join(map(lambda s: s.capitalize(), re.split('[ _]', sys.argv[1])))
 
 [north, south, west, east] = util.getBoundingBox(sys.argv, 2)
 

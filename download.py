@@ -32,7 +32,7 @@ def main():
     # * South_America    
 
     try:
-        continent = sys.argv[1]
+        continent = '_'.join(map(lambda s: s.capitalize(), re.split('[ _]', sys.argv[1])))
     except:
         continent = ""
     if not continent in ["Africa", "Australia", "Eurasia",  "Islands", "North_America", "South_America"]:

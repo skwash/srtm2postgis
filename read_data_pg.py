@@ -136,7 +136,7 @@ def main():
   db_psycopg2 = DatabasePsycopg2(database_pg.db, database_pg.db_user, database_pg.db_pass)
 
   try:
-      continent = sys.argv[1]
+      continent = '_'.join(map(lambda s: s.capitalize(), re.split('[ _]', sys.argv[1])))
       
   except: 
       print "Please specify the continent. Africa, Australia, Eurasia, Islands, North_America or South_America."
