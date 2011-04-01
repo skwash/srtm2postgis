@@ -26,11 +26,11 @@ class TestImportScript(unittest.TestCase):
      
        # Melbourne (West):
       west = loadTile('Australia', "S37E144")
-      self.assertEqual(west.sum(),223277342)
+      self.assertEqual(west.sum(),223277664)
 
       ## Melbourne (East):
       east = loadTile('Australia', "S37E145")
-      self.assertEqual(east.sum(), 271136709)
+      self.assertEqual(east.sum(), 271136969)
     
     def testTileOverlap(self):
       # Uses two adjecant tiles around Melbourne to test
