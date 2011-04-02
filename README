@@ -20,9 +20,6 @@ Verify that the download went correctly:
 
 python test/verify_download.py continent
 
-Unzip the files (adds 3 GB):
-$ for f in `ls *.zip`; do unzip $f; done
-
 Create a PostGIS database (you may need to change some things here depending on 
 your system):
 
