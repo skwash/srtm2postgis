@@ -1,6 +1,7 @@
 # Read srtm data files and put them in a Postgres database.
 import psycopg2
 import database_pg 
+import cStringIO
 
 import re
 import sys
@@ -79,20 +80,23 @@ class DatabasePsycopg2:
     begin = posFromLatLon(lat0,lon0)
 
     # First we write the data into a temporary file.
-    f = open('/tmp/tempcopy', 'w')
+    f = cStringIO.StringIO()
+
+    # int16 to string conversion is really slow, so we speed things up with caching
+    cache = {}
+
     # We drop the top row and right column.
     for row in range(1, len(tile)):
       for col in range(0, len(tile) - 1):
-        f.write(str(\
-        begin + (row-1) * 1200 + col\
-        ) + "\t" + str(tile[row][col] ) + "\n")
-
-    f.close() 
+        alt = tile[row][col]
+        if not cache.has_key(alt):
+            cache[alt] = str(alt)
+        alt = cache[alt]
+        f.write(str(begin + (row-1) * 1200 + col) + "\t" + alt + "\n")
 
     # Now we read the data from the temporary file and put it in the
     # altitude table.
-
-    f = open('/tmp/tempcopy', 'r')
+    f.seek(0) 
     self.cursor.copy_from(f, 'altitude') 
     f.close() 
 
@@ -166,17 +170,16 @@ def main():
 
       if resume_from == "":
 
-        # Load tile from file
-        tile = loadTile(continent, file)
-
         # First check if the tile is not already in the database:
-
         try:
           db_psycopg2.fetchTopLeftAltitude(lat, lon)
           print("Skipping tile " + file + " (" + str(i) + " / " + str(number_of_tiles) + ") ...")
 
         except IndexError:
           print("Insert data for tile " + file + " (" + str(i) + " / " + str(number_of_tiles) + ") ...")
+
+          # Load tile from file
+          tile = loadTile(continent, file)
 
           db_psycopg2.insertTile(tile, lat, lon)
 
