@@ -23,7 +23,7 @@ create column family AltitudeSRTM3 WITH comparator=LongType AND key_validation_c
 class ColumnFamilyCass:
   def __init__(self, keyspace, cf_name, nodelist):
 
-    pool = ConnectionPool(keyspace, nodelist)
+    pool = ConnectionPool(keyspace, nodelist, timeout=5, pool_timeout=60)
     self.cf = pycassa.ColumnFamily(pool, cf_name)
 
   def __del__(self):
@@ -53,6 +53,7 @@ class ColumnFamilyCass:
   def readTile(self, lat0, lon0):
     # We need the tile name to know which row key to get.
     tileName = tileFromLatLon(lat0,lon0)
+    print tileName
 
     # Calculate begin and end position
     begin = posFromLatLon(lat0,lon0)
@@ -83,7 +84,6 @@ class ColumnFamilyCass:
     return tile
 
   def insertTile(self, tile, lat0, lon0):
-
     # We need the tile name to know which row key to get.
     tileName = tileFromLatLon(lat0, lon0)
     #print "tileName:", tileName
@@ -94,7 +94,7 @@ class ColumnFamilyCass:
     # We want to accumulate a bunch of columns before we insert into Cassandra.
     columns = {}
     i=0
-    insert_max=1000
+    insert_max=25000
 
     # We drop the top row and right column.
     for row in range(1, len(tile)):
@@ -109,6 +109,10 @@ class ColumnFamilyCass:
         if i == insert_max:
           self.cf.insert(tileName, columns)
           columns = {}
+          i=0
+
+        else:
+          i+=1
 
     # Send insert any thing left after the loop exits.
     self.cf.insert(tileName, columns);
