@@ -2,6 +2,17 @@ Script that imports the SRTM data in a PostGIS (PostgreSQL) database.
 
 http://wiki.openstreetmap.org/index.php/Route_altitude_profiles_SRTM#SRTM_import
 
+NOTE: POSTGIS METHOD DOESN'T REALLY REQUIRE POSTGIS SINCE EVERYTHING IS INTEGER VALUES
+
+Requires:
+Python GDAL
+
+Cassandra Requires:
+ - pycassa (For Cassandra)
+
+Postgres Requires:
+ - psycopg2 (For Postgres/postgis)
+
 Usage:
 First run the tests that come with this script:
 
