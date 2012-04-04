@@ -33,6 +33,23 @@ def connectToDatabasePsycopg2(database):
 def posFromLatLon(lat,lon):
   return (lat * 360 + lon) * 1200 * 1200
 
+def tileFromLatLon(lat,lon):
+
+  if lat > 0:
+    lat_str = "N"
+  else:
+    lat_str = "S"
+
+  if lon > 0:
+    lon_str = "E"
+  else:
+    lon_str = "W"
+
+  lat = abs(int(lat))
+  lon = abs(int(lon))
+  
+  return "%s%s%s%s" % (lat_str, lat, lon_str, lon)
+
 def verify(db, number_of_tiles, files_hashes, continent, north, south, west, east):
     # For every tile, verify the bottom left coordinate.
     for file in files_hashes:
